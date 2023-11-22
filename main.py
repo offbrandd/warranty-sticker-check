@@ -2,7 +2,7 @@ import csv
 import tkinter as tk
 import gspread
 
-gc = gspread.service_account(filename='REDACTED')
+gc = gspread.service_account(filename='***REMOVED***.json')
 
 sh = gc.open("Sprout Computer Care")
 worksheet = sh.worksheet("Master List")
@@ -73,6 +73,5 @@ result_canvas.grid(row=1,column=2)
 result_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
 if __name__ == "__main__":
-    while(True):
-        root.update()
+    root.mainloop()
 
