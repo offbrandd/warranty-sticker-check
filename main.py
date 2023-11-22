@@ -2,7 +2,7 @@ import csv
 import tkinter as tk
 import gspread
 
-gc = gspread.service_account(filename='***REMOVED***.json')
+gc = gspread.service_account(filename='keys.json')
 
 sh = gc.open("Sprout Computer Care")
 worksheet = sh.worksheet("Master List")
