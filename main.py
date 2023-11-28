@@ -1,47 +1,51 @@
-import csv
 import tkinter as tk
 import gspread
 from playsound import playsound
 
-
 gc = gspread.service_account(filename='keys.json')
 sh = gc.open("Sprout Computer Care")
 
-worksheet = sh.worksheet("Master List")
-master_list = worksheet.get_all_values()
+master_worksheet = sh.worksheet("Master List")
+master_list = master_worksheet.get_all_values()
 master_sn_col = master_list[0].index("sn")
 warranty_col = master_list[0].index("warranty")
+stickered_col = master_list[0].index("stickered")
 
-worksheet = sh.worksheet("Query result")
-query_list = worksheet.get_all_values()
+query_worksheet = sh.worksheet("Query result")
+query_list = query_worksheet.get_all_values()
 barcode_col = query_list[0].index("asset_barcode")
 query_sn_col = query_list[0].index("device_serial")
 
 
 def get_serial(barcode):
     for row in query_list:
+        
         if row[barcode_col] == barcode:
             return row[query_sn_col]
     return "NA"
 
 def isWarranty(sn):
+    count = 0
     for row in master_list:
-        if row[master_sn_col] == sn:
+        if row[master_sn_col].casefold() == sn:    
             try: 
                 if row[warranty_col].index('y') > -1:
-                    return True
+                    return [True, count]
             except ValueError:
-                return False
-    return False
+                return [False, count]
+        count += 1
+    return [False, count]
 
 def check_unit(barcode):
     sn = get_serial(barcode)
     if sn != "NA":
-        if isWarranty(sn):
+        is_warranty, index = isWarranty(sn.casefold())
+        if is_warranty:
             print("Warranty confirmed")
             result_canvas.configure(bg="green")
             result_label.configure(text=barcode)
             playsound('ding.mp3', block=False)
+            master_worksheet.update_cell(index + 1, stickered_col + 1, 'y')
         else:
             print("Warranty expired")
             result_canvas.configure(bg="red")
@@ -75,4 +79,3 @@ result_label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
 if __name__ == "__main__":
     root.mainloop()
-
