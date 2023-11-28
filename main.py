@@ -1,10 +1,12 @@
 import csv
 import tkinter as tk
 import gspread
+from playsound import playsound
+
 
 gc = gspread.service_account(filename='keys.json')
-
 sh = gc.open("Sprout Computer Care")
+
 worksheet = sh.worksheet("Master List")
 master_list = worksheet.get_all_values()
 master_sn_col = master_list[0].index("sn")
@@ -15,7 +17,6 @@ query_list = worksheet.get_all_values()
 barcode_col = query_list[0].index("asset_barcode")
 query_sn_col = query_list[0].index("device_serial")
 
-#mainloop()
 
 def get_serial(barcode):
     for row in query_list:
@@ -40,6 +41,7 @@ def check_unit(barcode):
             print("Warranty confirmed")
             result_canvas.configure(bg="green")
             result_label.configure(text=barcode)
+            playsound('ding.mp3', block=False)
         else:
             print("Warranty expired")
             result_canvas.configure(bg="red")
@@ -52,7 +54,6 @@ def check_unit(barcode):
 def submit(self):
     barcode=barcode_var.get()
     barcode_var.set("")
-    print(barcode)
     check_unit(barcode)
 
 root = tk.Tk()
